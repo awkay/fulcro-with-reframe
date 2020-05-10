@@ -12,6 +12,10 @@
 (def schema {:account/id {:db/cardinality :db.cardinality/one
                           :db/unique      :db.unique/identity}})
 
-(defn new-database [] (d/create-conn schema))
+(defn new-database [] (d/create-conn schema) )
 
-(defstate conn :start (new-database))
+(defstate conn :start
+  (do
+    (let [c (new-database)]
+      (d/transact! c [{:account/id 1 :account/active? true :account/email "bob@nowhere.com"}])
+      c)))

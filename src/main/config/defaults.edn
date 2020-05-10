@@ -29,7 +29,7 @@
                                           :not-modified-responses true}
                               :static    {:resources "public"}
                               :session   true
-                              :security  {:anti-forgery   true
+                              :security  {:anti-forgery   false
                                           :hsts           true
                                           :ssl-redirect   false
                                           :frame-options  :sameorigin

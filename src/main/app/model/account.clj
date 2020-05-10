@@ -13,9 +13,15 @@
   [any? => (s/coll-of uuid? :kind vector?)]
   (d/q '[:find [?v ...]
          :where
-         [?e :account/active? true]
+         ;;[?e :account/active? true]
          [?e :account/id ?v]]
     db))
+
+(defmutation deactivate [{:keys [connection]} {:account/keys [id]}]
+  {::pc/sym 'app.client/deactivate}
+  (log/spy :info id)
+  (d/transact! connection [[:db/add id :account/active? false]])
+  nil)
 
 (defresolver all-users-resolver [{:keys [db]} input]
   {;;GIVEN nothing (e.g. this is usable as a root query)
@@ -34,4 +40,4 @@
    ::pc/output [:account/email :account/active?]}
   (get-account db id [:account/email :account/active?]))
 
-(def resolvers [all-users-resolver account-resolver])
+(def resolvers [deactivate all-users-resolver account-resolver])

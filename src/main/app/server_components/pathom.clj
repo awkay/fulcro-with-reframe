@@ -41,9 +41,9 @@
   req)
 
 (defn build-parser [db-connection]
-  (let [real-parser (p/parallel-parser
-                      {::p/mutate  pc/mutate-async
-                       ::p/env     {::p/reader               [p/map-reader pc/parallel-reader
+  (let [real-parser (p/parser
+                      {::p/mutate  pc/mutate
+                       ::p/env     {::p/reader               [p/map-reader pc/reader2
                                                               pc/open-ident-reader p/env-placeholder-reader]
                                     ::p/placeholder-prefixes #{">"}}
                        ::p/plugins [(pc/connect-plugin {::pc/register all-resolvers})
@@ -63,9 +63,9 @@
         ;; Understand that this makes the network responses much larger and should not be used in production.
         trace?      (not (nil? (System/getProperty "trace")))]
     (fn wrapped-parser [env tx]
-      (async/<!! (real-parser env (if trace?
-                                    (conj tx :com.wsscode.pathom/trace)
-                                    tx))))))
+      (real-parser env (if trace?
+                         (conj tx :com.wsscode.pathom/trace)
+                         tx)))))
 
 (defstate parser
   :start (build-parser db/conn))

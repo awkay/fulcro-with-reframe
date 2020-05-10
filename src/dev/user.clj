@@ -32,3 +32,6 @@
   (stop)
   (tools-ns/refresh :after 'user/start))
 
+(comment
+  (restart))
+

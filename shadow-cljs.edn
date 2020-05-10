@@ -6,9 +6,6 @@
 
                        :modules    {:main {:init-fn app.client/init
                                            :entries [app.client]}}
-                       ;; guardrails checks only during dev
-                       :dev        {:compiler-options
-                                    {:external-config {:guardrails {}}}}
 
                        :devtools   {:after-load app.client/refresh
                                     :preloads   [com.fulcrologic.fulcro.inspect.preload app.development-preload]}}
