@@ -14,11 +14,11 @@
 (defn all-people
   "Returns a sequence of UUIDs for all of the active accounts in the system"
   [db]
-  (log/spy :info (d/q '[:find [?v ...]
-          :where
-          ;;[?e :account/active? true]
-          [?e :person/id ?v]]
-     db)))
+  (d/q '[:find [?v ...]
+         :where
+         ;;[?e :account/active? true]
+         [?e :person/id ?v]]
+    db))
 
 (defresolver all-people-resolver [{:keys [db]} input]
   {::pc/output [{:all-people [:person/id]}]}
@@ -27,16 +27,22 @@
                  (all-people db))})
 
 (defn get-person [db id subquery]
-  (log/spy :info (d/pull db subquery [:person/id id])))
+  (d/pull db subquery [:person/id id]))
 
 (defresolver person-resolver [{:keys [db] :as env} {:person/keys [id]}]
   {::pc/input  #{:person/id}
-   ::pc/output [:person/email :person/happy? {:person/children [:person/id]}]}
-  (log/spy :info (get-person db id [:person/id :person/email :person/happy? {:person/children [:person/id]}])))
+   ::pc/output [:person/email
+                :person/happy?
+                {:person/address [:address/id]}
+                {:person/children [:person/id]}]}
+  (get-person db id
+    [:person/id :person/email :person/happy?
+     {:person/address [:address/id]}
+     {:person/children [:person/id]}]))
 
 (def resolvers [alter-mood all-people-resolver person-resolver])
 
 (comment
   (d/q '[:find (pull ?e [* {:person/children [:person/id]}])
          :where
-         [?e :person/id]] @db/conn ))
+         [?e :person/id]] @db/conn))

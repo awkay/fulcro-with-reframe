@@ -4,11 +4,12 @@
     [taoensso.timbre :as log]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.core :as p]
-    [app.model.person :as acct]
+    [app.model.person :as person]
+    [app.model.address :as addr]
     [app.server-components.config :refer [config]]
     [app.model.mock-database :as db]))
 
-(def all-resolvers [acct/resolvers])
+(def all-resolvers [person/resolvers addr/resolvers])
 
 (defn preprocess-parser-plugin
   "Helper to create a plugin that can view/modify the env/tx of a top-level request.
