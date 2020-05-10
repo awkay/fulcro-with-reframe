@@ -7,6 +7,6 @@
 (defresolver address-resolver [{:keys [db] :as env} {:address/keys [id]}]
   {::pc/input  #{:address/id}
    ::pc/output [:address/id :address/street :address/city]}
-  (log/spy :info (d/pull db [:address/id :address/street :address/city] [:address/id id])))
+  (d/pull db [:address/id :address/street :address/city] [:address/id id]))
 
 (def resolvers [address-resolver])

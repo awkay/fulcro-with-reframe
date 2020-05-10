@@ -15,7 +15,7 @@
     [com.fulcrologic.fulcro.inspect.inspect-client :as inspect]))
 
 ;; We can use Fulcro's defsc as a simple `defquery` mechanism
-(defsc Address [this {:keys [:address/id :address/street :address/city] :as props}]
+(defsc Address [_ _]
   {:query [:address/id :address/street :address/city]
    :ident :address/id})
 
@@ -39,7 +39,7 @@
     (fdn/db->tree [{root (comp/get-query component db)}] db db)
     root))
 
-(defn run-eql "Run a raw EQL query" [db [_ eql]] (fdn/db->tree (log/spy :info eql) db db))
+(defn run-eql "Run a raw EQL query" [db [_ eql]] (fdn/db->tree eql db db))
 (defn run-eql-entity "Run a raw EQL query starting at an entity" [db [_ ident eql]] (fdn/db->tree eql (get-in db ident) db))
 
 (defn get-person [db [event-name {:keys [person/id]}]]
@@ -81,9 +81,8 @@
   []
   (let [person @(rf/subscribe [:eql-entity [:person/id 3] [:person/id :person/email :person/happy?]])
         ;person @(rf/subscribe [:get-person {:person/id 3}])
-        ;people (:all-people @(rf/subscribe [:eql [{:all-people [:person/id :person/email]}]]))
-        people @(rf/subscribe [:q {:root :all-people :component Person}])
-        ]
+        ;people (:all-people @(rf/subscribe [:eql [{:all-people [:person/id :person/email :person/happy?]}]]))
+        people @(rf/subscribe [:q {:root :all-people :component Person}])]
     [:div
      [:button {:onClick #(df/load! SPA [:person/id 3] Person)} "Load a person"]
      [:h3 "A single person"]
@@ -106,3 +105,6 @@
   (inspect/app-started! SPA)
   (render))
 
+(comment
+  (df/load! SPA :all-people Person)
+  )
