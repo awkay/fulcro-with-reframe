@@ -46,17 +46,24 @@
              [:li {:key (str id)}
               [ui-person-tree c]]) children)])])
 
+(defn ui-person
+  [{:person/keys [id email happy?]}]
+  [:div {:key (str id)}
+   (str "Person" id ", " email ", " happy?)
+   [:button {:onClick #(comp/transact! SPA [(person/alter-mood {:person/id id :person/happy? (not happy?)})])} "Alter mood"]])
+
 (defn ui-app
   []
   (let [person @(rf/subscribe [:get-person {:person/id 3}])
         people @(rf/subscribe [:q {:root      :all-people
                                    :component Person}])]
     [:div
+     [:button {:onClick #(df/load! SPA [:person/id 3] Person)} "Load a person"]
      [:h3 "A single person"]
-     [ui-person-tree person]
+     [ui-person person]
      [:h3 "All people"]
      [:div
-      [:button {:onClick #(df/load! SPA :all-people Person)} "Load"]
+      [:button {:onClick #(df/load! SPA :all-people Person)} "Load people"]
       (map (fn [person] [:div {:key (:person/id person)}
                          [ui-person-tree person]]) people)]]))
 
