@@ -4,22 +4,11 @@
     [taoensso.timbre :as log]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.core :as p]
-    [com.wsscode.common.async-clj :refer [let-chan]]
-    [clojure.core.async :as async]
-    [app.model.account :as acct]
-    [app.model.session :as session]
+    [app.model.person :as acct]
     [app.server-components.config :refer [config]]
     [app.model.mock-database :as db]))
 
-(pc/defresolver index-explorer [env _]
-  {::pc/input  #{:com.wsscode.pathom.viz.index-explorer/id}
-   ::pc/output [:com.wsscode.pathom.viz.index-explorer/index]}
-  {:com.wsscode.pathom.viz.index-explorer/index
-   (-> (get env ::pc/indexes)
-     (update ::pc/index-resolvers #(into {} (map (fn [[k v]] [k (dissoc v ::pc/resolve)])) %))
-     (update ::pc/index-mutations #(into {} (map (fn [[k v]] [k (dissoc v ::pc/mutate)])) %)))})
-
-(def all-resolvers [acct/resolvers session/resolvers index-explorer])
+(def all-resolvers [acct/resolvers])
 
 (defn preprocess-parser-plugin
   "Helper to create a plugin that can view/modify the env/tx of a top-level request.
@@ -69,4 +58,7 @@
 
 (defstate parser
   :start (build-parser db/conn))
+
+(comment
+  (parser {} [{:all-people [:person/id :person/email]}]))
 

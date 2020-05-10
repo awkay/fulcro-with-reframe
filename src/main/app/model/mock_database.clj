@@ -9,13 +9,19 @@
 ;; In datascript just about the only thing that needs schema
 ;; is lookup refs and entity refs.  You can just wing it on
 ;; everything else.
-(def schema {:account/id {:db/cardinality :db.cardinality/one
-                          :db/unique      :db.unique/identity}})
+(def schema {:person/id       {:db/cardinality :db.cardinality/one
+                               :db/unique      :db.unique/identity}
+             :person/children {:db/cardinality :db.cardinality/many
+                               :db/valueType   :db.type/ref}})
 
-(defn new-database [] (d/create-conn schema) )
+(defn new-database [] (d/create-conn schema))
 
 (defstate conn :start
   (do
     (let [c (new-database)]
-      (d/transact! c [{:account/id 1 :account/active? true :account/email "bob@nowhere.com"}])
+      ;; Seed some data
+      (d/transact! c [{:db/id "1" :person/id 1 :person/happy? true :person/email "amiee@nowhere.com"}
+                      {:db/id "2" :person/id 2 :person/happy? true :person/children ["3"] :person/email "sam@nowhere.com"}
+                      {:db/id "3" :person/id 3 :person/happy? true :person/email "sally@nowhere.com"}
+                      {:db/id "4" :person/id 4 :person/happy? true :person/children ["1" "2"] :person/email "grut@nowhere.com"}])
       c)))
